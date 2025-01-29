@@ -1,4 +1,5 @@
 import {
+  Alert,
   Image,
   Pressable,
   StyleSheet,
@@ -7,10 +8,25 @@ import {
   View,
 } from 'react-native';
 import React, {useState} from 'react';
+import {addVehicle} from '../../../api/vehicle';
 
 export default function VehicleRegistration() {
   const [manufacturer, setManufacturer] = useState('');
   const [model, setModel] = useState('');
+  const [vehicleNumber, setVehicleNumber] = useState('');
+
+  const onSubmitHandler = async () => {
+    try {
+      const res = await addVehicle(model, manufacturer, vehicleNumber);
+      if (res.success) {
+        Alert.alert('Sucess', 'Congrats Vehicle Added Successfully');
+      }
+    } catch (error) {
+      if (error.status === 409) {
+        Alert.alert('Error', 'Vehicle Already Exists');
+      }
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -24,7 +40,7 @@ export default function VehicleRegistration() {
       <Text style={styles.text2}>Manufacturer</Text>
       <TextInput
         style={styles.input}
-        placeholder="Enter Your Number"
+        placeholder="Enter Your Manufacture Number"
         value={manufacturer}
         onChangeText={setManufacturer}
         placeholderTextColor={'black'}
@@ -33,9 +49,9 @@ export default function VehicleRegistration() {
       <Text style={styles.text2}>Model</Text>
       <TextInput
         style={styles.input}
-        placeholder="Enter Your Number"
-        value={model}
-        onChangeText={setModel}
+        placeholder="Enter Your Model"
+        value={vehicleNumber}
+        onChangeText={setVehicleNumber}
         placeholderTextColor={'black'}
       />
 
@@ -50,7 +66,7 @@ export default function VehicleRegistration() {
         placeholderTextColor={'grey'}
       />
 
-      <Pressable style={styles.btnContainer} onPress={() => {}}>
+      <Pressable style={styles.btnContainer} onPress={onSubmitHandler}>
         <Text style={styles.btnTxt}>Save Vehicle</Text>
       </Pressable>
     </View>

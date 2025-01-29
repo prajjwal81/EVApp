@@ -1,5 +1,5 @@
 import {useNavigation} from '@react-navigation/native';
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -9,9 +9,46 @@ import {
   Image,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import {getItem} from '../../../utils/asyncStorage';
+import {getProfile, setProfile} from '../../../../api/profile';
 
 const ProfileScreen = () => {
   const navigation = useNavigation();
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+
+  useEffect(() => {
+    (async function getDataFromLocalStorage() {
+      const res = await getItem('user');
+      setPhone(res.phoneNumber);
+    })();
+
+    (async function getProfileData() {
+      const res = await getProfile();
+      if (
+        Array.from(Object.keys(res.user)).includes('name') ||
+        Array.from(Object.keys(res.user)).includes('email')
+      ) {
+        setName(res.user.name);
+        setEmail(res.user.email);
+      }
+    })();
+  }, []);
+
+  const submitHandler = async (
+    name: string,
+    email: string,
+    phoneNumber: string,
+  ) => {
+    try {
+      const res = await setProfile(name, email, phoneNumber);
+      console.log(res);
+    } catch (error) {
+      console.log('Error', error);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View
@@ -39,6 +76,8 @@ const ProfileScreen = () => {
           style={styles.input}
           placeholder="Enter Your Name"
           placeholderTextColor="#999"
+          value={name}
+          onChangeText={text => setName(text)}
         />
       </View>
 
@@ -59,6 +98,8 @@ const ProfileScreen = () => {
             placeholder="2299348112"
             placeholderTextColor="#999"
             keyboardType="phone-pad"
+            value={phone}
+            editable={false}
           />
         </View>
       </View>
@@ -70,10 +111,14 @@ const ProfileScreen = () => {
           placeholder="Enter Your Email"
           placeholderTextColor="#999"
           keyboardType="email-address"
+          value={email}
+          onChangeText={text => setEmail(text)}
         />
       </View>
 
-      <TouchableOpacity style={styles.saveButton}>
+      <TouchableOpacity
+        style={styles.saveButton}
+        onPress={() => submitHandler(name, email, phone)}>
         <Text style={styles.saveButtonText}>Save</Text>
       </TouchableOpacity>
     </View>

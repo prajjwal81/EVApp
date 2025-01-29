@@ -5,12 +5,14 @@ interface GlobalState {
   removeBottomTab: boolean;
   profilePhoto: string;
   bucketURL: string;
+  loginOrNot: boolean;
 }
 
 const initialState: GlobalState = {
   removeBottomTab: true,
   profilePhoto: '',
   bucketURL: '/',
+  loginOrNot: false,
 };
 
 export const GlobalSlice = createSlice({
@@ -26,10 +28,13 @@ export const GlobalSlice = createSlice({
     setBucketURL: (state, action) => {
       state.bucketURL = action.payload;
     },
+    setLoginOrNot: (state, action) => {
+      state.loginOrNot = action.payload;
+    },
   },
 });
 
-export const {toggleBottomTab, setProfilePhoto, setBucketURL} =
+export const {toggleBottomTab, setProfilePhoto, setBucketURL, setLoginOrNot} =
   GlobalSlice.actions;
 
 export default GlobalSlice.reducer;

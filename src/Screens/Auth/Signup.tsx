@@ -9,23 +9,23 @@ import {
   Pressable,
   Alert,
 } from 'react-native';
-import {login} from '../../../api/auth';
+import {register} from '../../../api/auth';
 import {setItem} from '../../utils/asyncStorage';
 import {setLoginOrNot} from '../../../Redux/Global/Global';
 import {useDispatch} from 'react-redux';
 
-export default function Login() {
+export default function Signup() {
   const navigation = useNavigation();
   const [number, setNumber] = useState('');
   const dispatch = useDispatch();
-  const onLoginHandler = async (number: string) => {
+  const onSignupHandler = async (number: string) => {
     try {
-      const res = await login(number);
+      const res = await register(number);
 
-      if (res.message === 'Login successful') {
+      if (res.message === 'Signup successful') {
         await setItem('user', res.user);
         await setItem('token', res.token);
-        if (res.isVerified) navigation.navigate('OTP');
+        if (!res.isVerified) navigation.navigate('OTP');
         else {
           dispatch(setLoginOrNot(true));
         }
@@ -48,7 +48,7 @@ export default function Login() {
         style={styles.image}
         resizeMode="cover"
       />
-      <Text style={styles.text}>Hello! Login to get started</Text>
+      <Text style={styles.text}>Hello! Register to get started</Text>
 
       <TextInput
         style={styles.input}
@@ -63,13 +63,13 @@ export default function Login() {
           {backgroundColor: 'rgba(12, 113, 255, 1)', borderRadius: 15},
         ]}
         onPress={() => {
-          onLoginHandler(number);
+          onSignupHandler(number);
         }}>
-        <Text style={styles.next}>Login</Text>
+        <Text style={styles.next}>Register</Text>
       </Pressable>
-      <Pressable onPress={() => navigation.navigate('Signup')}>
+      <Pressable onPress={() => navigation.navigate('Login')}>
         <Text style={styles.loginText}>
-          Need a new account? <Text style={styles.loginLink}>Signup</Text>
+          Already have an account? <Text style={styles.loginLink}>Login</Text>
         </Text>
       </Pressable>
     </View>

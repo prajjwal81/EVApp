@@ -1,5 +1,6 @@
 import {useNavigation} from '@react-navigation/native';
-import React, {useCallback, useState} from 'react';
+import axios from 'axios';
+import React, {useCallback, useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -9,6 +10,7 @@ import {
   Pressable,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import {getVehicle} from '../../../api/vehicle';
 
 const Child = ({onClick}) => {
   return (
@@ -16,7 +18,7 @@ const Child = ({onClick}) => {
       onPress={() => {
         onClick();
       }}>
-      <Text>click</Text>
+      <Text></Text>
     </Pressable>
   );
 };
@@ -24,8 +26,7 @@ const Child = ({onClick}) => {
 const MyVehiclesScreen = () => {
   const [selectedVehicle, setSelectedVehicle] = useState(null);
   const navigation = useNavigation();
-
-  const vehicles = [
+  const [vehicles, setVehicles] = useState([
     {
       id: '1',
       brand: 'Mahindra',
@@ -38,10 +39,18 @@ const MyVehiclesScreen = () => {
       model: 'XUV 400',
       registration: 'HR 12 QQ ABCD',
     },
-  ];
+  ]);
+  console.log('===>', vehicles);
 
   const handleVehiclePress = useCallback((id: string) => {
     setSelectedVehicle(id);
+  }, []);
+
+  useEffect(() => {
+    (async function getVehicleData() {
+      const res = await getVehicle();
+      setVehicles(res);
+    })();
   }, []);
 
   const renderVehicle = ({item}: any) => {
@@ -51,9 +60,11 @@ const MyVehiclesScreen = () => {
         style={[styles.card, isSelected && styles.selectedCard]}
         onPress={() => handleVehiclePress(item.id)}>
         <View>
-          <Text style={styles.brand}>{item.brand}</Text>
+          <Text style={styles.brand}>{item.manufacture}</Text>
           <Text style={styles.model}>{item.model}</Text>
-          <Text style={styles.registration}>{item.registration}</Text>
+          <Text style={styles.registration}>
+            {item.vehicleRegistrationNumber}
+          </Text>
         </View>
         <Ionicons name="chevron-forward" size={24} color="#0057FF" />
       </TouchableOpacity>

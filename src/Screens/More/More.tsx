@@ -1,10 +1,17 @@
 import {useNavigation} from '@react-navigation/native';
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {View, Text, TouchableOpacity, StyleSheet, Image} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import {clearItem, getItem} from '../../utils/asyncStorage';
+import {setLoginOrNot} from '../../../Redux/Global/Global';
+import {useDispatch} from 'react-redux';
 
 const More = () => {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+
   const handleEditProfile = () => {
     navigation.navigate('ProfileScreen');
   };
@@ -17,16 +24,29 @@ const More = () => {
     console.log('Navigate to Help');
   };
 
-  const handleLogout = () => {
-    console.log('Logout');
+  const handleLogout = async () => {
+    await clearItem('token');
+    await clearItem('user');
+    dispatch(setLoginOrNot(false));
   };
+
+  useEffect(() => {
+    (async function getDataFromLocalStorage() {
+      const res = await getItem('user');
+
+      if (res.name !== undefined) {
+        setName(res.name);
+        setPhone(res.phoneNumber);
+      }
+    })();
+  }, []);
 
   return (
     <View style={styles.container}>
       <View style={styles.profileContainer}>
         <View style={styles.profileInfo}>
-          <Text style={styles.name}>Kartik</Text>
-          <Text style={styles.phone}>Phone: +91 2299348112</Text>
+          <Text style={styles.name}>{name}</Text>
+          <Text style={styles.phone}>Phone: +91 {phone}</Text>
         </View>
         <TouchableOpacity onPress={handleEditProfile}>
           <Icon name="edit" size={24} color="#000" />
